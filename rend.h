@@ -55,3 +55,11 @@ int GzPutAttribute(GzRender	*render, int numAttributes, GzToken	*nameList,
 	GzPointer *valueList);
 int GzPutTriangle(GzRender *render, int	numParts, GzToken *nameList,
 	GzPointer *valueList);
+
+// Helper Functions
+void sortTriangleVertices(float * values, int ** sortedIndices);
+int sign(float value);
+void getPlane(GzCoord * triangleVertices, float * A, float * B, float * C, float * D);
+float interpolateZ(float A, float B, float C, float D, float x, float y);
+
+short ctoi(float color);

@@ -71,7 +71,7 @@ int GzInitDisplay(GzDisplay	*display)
 				pixel->green = 2000;
 				pixel->blue = 2000;
 				pixel->alpha = 4095;
-				pixel->z = 4095;
+				pixel->z = MAXINT;
 			}
 		}
 		return GZ_SUCCESS;
