@@ -152,7 +152,7 @@ int GzPutTriangle(GzRender *render, int	numParts, GzToken *nameList,
 							memcpy(Vertices[1], temp, sizeof(GzCoord));
 						}
 						else {
-							// Some line in the z-axis
+							// Top edge is a line in the z-axis (triangle appears as vertical line)
 							// TODO: what???
 							// Assuming we won't have to deal with this for now?
 							return GZ_SUCCESS;
@@ -177,7 +177,7 @@ int GzPutTriangle(GzRender *render, int	numParts, GzToken *nameList,
 							// Leave alone
 						}
 						else {
-							// Some line in the z-axis
+							// Bottom edge is a line in the z-axis (triangle appears as vertical line)
 							// TODO: what???
 							// Assuming we won't have to deal with this for now?
 							return GZ_SUCCESS;
@@ -212,7 +212,7 @@ int GzPutTriangle(GzRender *render, int	numParts, GzToken *nameList,
 							edgeTypes[1] = LEFT_EDGE;
 						}
 						else {
-							// Weird case where all edges have same slope
+							// Weird case where all edges have same slope (triangle appears as line)
 							// TODO: what???
 							// Assuming we won't have to deal with this for now?
 							return GZ_SUCCESS;
@@ -264,20 +264,41 @@ int GzPutTriangle(GzRender *render, int	numParts, GzToken *nameList,
 							int s0 = sign(E0);
 							int s1 = sign(E1);
 							int s2 = sign(E2);
-							if ((s0 == s1) && (s1 == s2) && (s0 == s2)) {
-								GzIntensity r, g, b, a;
-								GzDepth z;
-								GzGetDisplay(render->display, i, j, &r, &g, &b, &a, &z);
-								// Interpolate z-depth
-								float interpZ = interpolateZ(NA, NB, NC, ND, i, j);
-								if (interpZ < z || z == 0) {
-									// closer - update pixel
-									GzPutDisplay(render->display, i, j, ctoi(render->flatcolor[RED]), ctoi(render->flatcolor[GREEN]), ctoi(render->flatcolor[BLUE]), a, interpZ);
+
+							if (s0 == 0) {
+								if (!(edgeTypes[0] == LEFT_EDGE || edgeTypes[0] == TOP_EDGE)) {
+									// On edge 0 but edge 0 is neither a left or top edge
+									continue;
 								}
-								
-								
 							}
-							// TODO: need to account for corner and edge cases (literally)
+							if (s1 == 0) {
+								if (!(edgeTypes[1] == LEFT_EDGE || edgeTypes[1] == TOP_EDGE)) {
+									// On edge 1 but edge 1 is neither a left or top edge
+									continue;
+								}
+							}
+							if (s2 == 0) {
+								if (!(edgeTypes[2] == LEFT_EDGE || edgeTypes[2] == TOP_EDGE)) {
+									// On edge 2 but edge 2 is neither a left or top edge
+									continue;
+								}
+							}
+
+							if (!((s0 == s1) && (s1 == s2) && (s0 == s2))) {
+								// Outside the triangle
+								continue;
+							}
+							
+							// Fill in pixel
+							GzIntensity r, g, b, a;
+							GzDepth z;
+							GzGetDisplay(render->display, i, j, &r, &g, &b, &a, &z);
+							// Interpolate z-depth
+							float interpZ = interpolateZ(NA, NB, NC, ND, i, j);
+							if (interpZ < z || z == 0) {
+								// closer - update pixel
+								GzPutDisplay(render->display, i, j, ctoi(render->flatcolor[RED]), ctoi(render->flatcolor[GREEN]), ctoi(render->flatcolor[BLUE]), a, interpZ);
+							}
 						}
 					}
 						
